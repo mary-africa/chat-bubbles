@@ -38,7 +38,7 @@ const messages = [
 
 const composerOptions = {
     composerType: 'text',    // default composer 'text' | options 'text', 'image',
-    sendAction: async (input) => {
+    sendAction: async (input: any) => {
         return;
     },
     // You might want to move this to the BaseComposer
@@ -53,7 +53,7 @@ const composerOptions = {
 }
 
 export default function ChatBox() {
-    const sendCallback = async (message) => {
+    const sendCallback = async (message: any) => {
       console.log("Sent the message")
     }
 
@@ -61,7 +61,7 @@ export default function ChatBox() {
         <PotatoChat 
             initialComposer='text'
             initialMessages={messages}
-            globalContextState={globalContextState}
+            globalChatContext={globalContextState}
             composerOptions={composerOptions}
             sendCallback={sendCallback} />
         // <PotatoProvider initialMessages={[]}>
