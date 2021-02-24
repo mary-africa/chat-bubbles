@@ -1,7 +1,10 @@
 // import { useCallback } from 'react';
+import axios from 'axios';
+import reportWebVitals from '../../reportWebVitals';
 import { Potato } from '../react-chat-potato/@types';
 import { PotatoChat, ComposerBoxProps } from '../react-chat-potato/src'
 import { useChatUser, useMessage, useComposerComponent, useComposerType } from '../react-chat-potato/src/utils';
+import { useMessageUpdater } from '../react-chat-potato/utils';
 import { ComposerType, MessageInputType, composerOptions } from './composers'
 
 interface User {
@@ -18,6 +21,9 @@ const globalChatContext: Potato.GlobalChatContext<User> = {
         },
         'brian': {
             name: "Brian Gasper"
+        },
+        'parrot': {
+            name: "Ze Parrot"
         }
     }
 }
@@ -112,15 +118,28 @@ function ComposerBox({ sendAction }: ComposerBoxProps<ComposerType, MessageInput
 }
 
 export default function ChatBox({ url, title, description }: any) {
-    const sendAction = async (input: Potato.Composer.NewMessage<MessageInputType>, composerType: ComposerType) => {
+    const sendAction = async <T extends MessageInputType>(input: Potato.Composer.NewMessage<T>, composerType: ComposerType): Promise<null | Potato.Composer.NewMessage<T>> => {
         console.log("Send message:", input)
         console.log("ComposerType:", composerType)
 
-        switch (composerType) {
-            case 'text': console.log(">> Text based message"); break;
-            case 'image': console.log(">> Image based message"); break;
-            default: console.log("DEFAULT MESSAGE TRANSFER")
+        if (composerType === 'text') {
+            const response = await axios({
+                url,
+                method: 'POST',
+                headers: {
+                  "Content-Type": 'application/json',
+                  "Access-Control-Allow-Origin": "*"
+                },
+                data: JSON.stringify({
+                    message: input.input
+                })
+            })
+
+            const { data } = response
+            return ({ input: data.message, user: 'parrot' }) as Potato.Composer.NewMessage<T>
         }
+
+        return null
     }
 
     return (
