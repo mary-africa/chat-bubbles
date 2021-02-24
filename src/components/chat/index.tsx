@@ -111,7 +111,7 @@ function ComposerBox({ sendAction }: ComposerBoxProps<ComposerType, MessageInput
     )
 }
 
-export default function ChatBox() {
+export default function ChatBox({ url, title, description }: any) {
     const sendAction = async (input: Potato.Composer.NewMessage<MessageInputType>, composerType: ComposerType) => {
         console.log("Send message:", input)
         console.log("ComposerType:", composerType)
@@ -126,6 +126,10 @@ export default function ChatBox() {
     return (
         // wrapper for the chat
         <div className="w-full divide-y divide-gray-300 border rounded-md shadow-sm">
+            <div className="bg-blue-400 w-full px-4 py-6">
+                <h1 className="text-3xl font-bold">{title}</h1>
+                <p className="text-sm">{description}</p>
+            </div>
             <PotatoChat 
                 initialComposer='text'
                 initialMessages={messages}
