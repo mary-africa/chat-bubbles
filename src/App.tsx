@@ -3,7 +3,7 @@ import React from 'react';
 import ChatBox from './components/chat'
 
 function App() {
-  
+
   return (
     <div className="relative h-screen w-full p-24">
       {/* body of the site */}
@@ -29,7 +29,7 @@ function App() {
                 <input 
                   type="text" 
                   className="py-2 border focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-16 sm:pl-14 sm:text-sm border-gray-300 rounded-l-md" 
-                  placeholder="localhost:4321/chathook/234234" />
+                  placeholder="chathook.example.com/parrot" />
               </div>
               <button className="-ml-px relative inline-flex items-center space-x-2 px-3 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                 {/* <!-- Heroicon name: gloe-alt --> */}
@@ -43,7 +43,7 @@ function App() {
         </div>
 
         {/* right */}
-        <div className="row-start-1">
+        <div>
             <ChatBox />
         </div>
       </section>

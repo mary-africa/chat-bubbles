@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+// import { useCallback } from 'react';
 import { Potato } from '../react-chat-potato/@types';
 import { PotatoChat, ComposerBoxProps } from '../react-chat-potato/src'
 import { useChatUser, useMessage, useComposerComponent, useComposerType } from '../react-chat-potato/src/utils';
@@ -41,24 +41,44 @@ const messages: Potato.Messages<MessageInputType> = [
 const selfUser = { name: "Me" }
 const defaultUnknownUser = { name: "Anonymous" }
 
+
 function MessageCanvasWrapper({ children }: any) {
     return (
-        <div className="bg-green-300">
+        <div className="bg-gray-100 h-96 overflow-y-auto py-2 flex flex-col justify-end">
             {children}
         </div>
     )
 }
 
+
+function BaseMessage({ user, children, self }: any) {
+    const isYourMessage = Boolean(self)
+    return (
+        <div className={`py-2 px-4 flex ${ isYourMessage ? 'flex-row-reverse': 'flex-row'} items-start`}>
+            {/* {
+                !isYourMessage ? (
+                    <span className="inline-flex items-center mr-1.5 mt-1.5 justify-center h-10 w-10 rounded-full bg-gray-500">
+                        <span className="font-medium leading-none text-white">TW</span>
+                    </span>
+                ) : null
+            } */}
+            <div className={`px-4 py-2 rounded-xl max-w-sm bg-white shadow-sm`}>
+                <label className="text-xs font-semibold text-gray-500">{user.name}</label>
+                {children}
+            </div>
+        </div>
+    )
+}
+
 function Message({ messageId }: any) {
-    const message = useMessage(messageId)
+    const message = useMessage(messageId as number)
     const user = useChatUser(message.user, selfUser, defaultUnknownUser)
 
     return (
-        <div className="py-2">
+        <BaseMessage user={user} self={message.user === "self"}>
             {/* @ts-ignore */}
-            <label className="text-sm font-semibold text-gray-500">{user.name}</label>
-            <p>{message.input as string}</p>
-        </div>
+            <p className="w-full truncate" style={{ hyphens: 'auto' }}>{message.input as string}</p>
+        </BaseMessage>
     )
 }
 
@@ -71,20 +91,22 @@ function ComposerBox({ sendAction }: ComposerBoxProps<ComposerType, MessageInput
     // TODO: this re-rendering is not supposed to happen
     // console.log("Kevin")
     // callback for adding switching btn types
-    const onChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-        setCompType(e.target.value as ComposerType)
-    }, [setCompType])
+    // const onChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    //     setCompType(e.target.value as ComposerType)
+    // }, [setCompType])
 
     return (
-        <div>
-            <ComposerComponent sendAction={sendAction} />
-            <div>
+        <div className="w-full flex flex-col">
+            {/* <div className="w-full"> */}
+                <ComposerComponent sendAction={sendAction} />
+            {/* </div> */}
+            {/* <div className="w-full">
                 <label>Composer Option:</label>
                 <select name="composer-option" onChange={onChange} value={compType}>
                     <option value="text">Text</option>
                     <option value="image">Image</option>
                 </select>
-            </div>
+            </div> */}
         </div>
     )
 }
@@ -102,14 +124,17 @@ export default function ChatBox() {
     }
 
     return (
-        <PotatoChat 
-            initialComposer='text'
-            initialMessages={messages}
-            globalChatContext={globalChatContext}
-            composerOptions={composerOptions}
-            messageComponent={Message}
-            messageCanvasWrapper={MessageCanvasWrapper}
-            composerBox={ComposerBox}
-            sendAction={sendAction} />
+        // wrapper for the chat
+        <div className="w-full divide-y divide-gray-300 border rounded-md shadow-sm">
+            <PotatoChat 
+                initialComposer='text'
+                initialMessages={messages}
+                globalChatContext={globalChatContext}
+                composerOptions={composerOptions}
+                messageComponent={Message}
+                messageCanvasWrapper={MessageCanvasWrapper}
+                composerBox={ComposerBox}
+                sendAction={sendAction} />
+        </div>
     )
 }
