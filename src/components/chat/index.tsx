@@ -117,6 +117,9 @@ function ComposerBox({ sendAction }: ComposerBoxProps<ComposerType, MessageInput
     )
 }
 
+/**
+ * TODO: add ability to update board for sending infromation
+ */
 export default function ChatBox({ url, title, description }: any) {
     const sendAction = async <T extends MessageInputType>(input: Potato.Composer.NewMessage<T>, composerType: ComposerType): Promise<null | Potato.Composer.NewMessage<T>> => {
         console.log("Send message:", input)
