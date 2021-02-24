@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="relative h-screen w-full p-24">
       {/* body of the site */}
-      <section className="w-full mx-auto container grid grid-cols-2 gap-4 md:gap-10">
+      <section className="w-full mx-auto container grid grid-rows-2 md:grid-cols-2 gap-4 md:gap-10">
         {/* left */}
         <div>
           {/* Intro text */}
@@ -43,7 +43,7 @@ function App() {
         </div>
 
         {/* right */}
-        <div>
+        <div className="row-start-1">
             <ChatBox />
         </div>
       </section>

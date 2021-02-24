@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useCallback } from 'react';
 import { Potato } from '../react-chat-potato/@types';
-import { PotatoChat } from '../react-chat-potato/src'
-import { useSendCallback } from '../react-chat-potato/src/lib/utils';
-
+import { PotatoChat, ComposerBoxProps } from '../react-chat-potato/src'
+import { useChatUser, useMessage, useComposerComponent, useComposerType } from '../react-chat-potato/src/utils';
+import { ComposerType, MessageInputType, composerOptions } from './composers'
 
 interface User {
     name: string
@@ -17,7 +17,7 @@ const globalChatContext: Potato.GlobalChatContext<User> = {
             name: "Kevin James",
         },
         'brian': {
-            name: "Brian Gaspar"
+            name: "Brian Gasper"
         }
     }
 }
@@ -36,57 +36,58 @@ const messages: Potato.Messages<MessageInputType> = [
 ]
 
 /**
- * Composer Component details
+ * Structure of the user -> me (the person typing)
  */
-type ComposerType =
-    | 'text'
-    | 'image'
+const selfUser = { name: "Me" }
+const defaultUnknownUser = { name: "Anonymous" }
 
-type MessageInputType =
-    | string    // message type for text
-    | string    // message type for image
+function MessageCanvasWrapper({ children }: any) {
+    return (
+        <div className="bg-green-300">
+            {children}
+        </div>
+    )
+}
+
+function Message({ messageId }: any) {
+    const message = useMessage(messageId)
+    const user = useChatUser(message.user, selfUser, defaultUnknownUser)
+
+    return (
+        <div className="py-2">
+            {/* @ts-ignore */}
+            <label className="text-sm font-semibold text-gray-500">{user.name}</label>
+            <p>{message.input as string}</p>
+        </div>
+    )
+}
 
 
-function ImageComposer <TComposerType, TMessageInputType>({ composerType, sendAction }: Potato.Composer.OptionComponentProps<TComposerType, TMessageInputType> ) {
-    const [fileValue, setFile] = useState<string>("")
 
-    const onSend = useSendCallback(fileValue, composerType, sendAction)
+function ComposerBox({ sendAction }: ComposerBoxProps<ComposerType, MessageInputType>) {
+    const [compType, setCompType] = useComposerType<ComposerType>()
+    const ComposerComponent = useComposerComponent(compType)
+
+    // TODO: this re-rendering is not supposed to happen
+    // console.log("Kevin")
+    // callback for adding switching btn types
+    const onChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+        setCompType(e.target.value as ComposerType)
+    }, [setCompType])
+
     return (
         <div>
-            <div>Send the image here</div>
-            <input type="file" value={fileValue} onChange={(e) => setFile(e.target.value)}/>
-            <button onClick={onSend} className="bg-green-400 px-4 py-2 rounded-sm">
-                Send Image
-            </button>
+            <ComposerComponent sendAction={sendAction} />
+            <div>
+                <label>Composer Option:</label>
+                <select name="composer-option" onChange={onChange} value={compType}>
+                    <option value="text">Text</option>
+                    <option value="image">Image</option>
+                </select>
+            </div>
         </div>
     )
 }
-    
-
-function TextComposer <TComposerType, TMessageInputType>({ composerType, sendAction }: Potato.Composer.OptionComponentProps<TComposerType, TMessageInputType>) {
-    const [value, setValue] = useState<string>("")
-    const onSend = useSendCallback(value, composerType, sendAction)
-
-    return (
-        <div className="w-full justify-start flex items-start gap-4">
-            <textarea className="border w-96" value={value} onChange={(e) => setValue(e.target.value)}/>
-            <button onClick={onSend} className="bg-green-700 px-4 py-2 rounded-sm">
-                Send
-            </button>
-        </div>
-    )
-}
-    
-
-const composerOptions: Potato.Composer.GlobalContext<ComposerType, MessageInputType> = {
-    composerType: 'text', 
-    composerOptions: {
-        'text': { component: TextComposer },
-        'image': { component: ImageComposer },
-    }
-}
-
-
 
 export default function ChatBox() {
     const sendAction = async (input: Potato.Composer.NewMessage<MessageInputType>, composerType: ComposerType) => {
@@ -102,10 +103,13 @@ export default function ChatBox() {
 
     return (
         <PotatoChat 
-            initialComposer='image'
+            initialComposer='text'
             initialMessages={messages}
             globalChatContext={globalChatContext}
-            composerConfig={composerOptions}
+            composerOptions={composerOptions}
+            messageComponent={Message}
+            messageCanvasWrapper={MessageCanvasWrapper}
+            composerBox={ComposerBox}
             sendAction={sendAction} />
     )
 }
