@@ -3,10 +3,10 @@ import React, { useCallback, useState } from 'react';
 import ChatBox from './components/chat'
 import { Potato } from './components/react-chat-potato/@types';
 import { PotatoChatProvider } from './components/react-chat-potato/src';
-import { MessageInputType } from './components/chat/composers';
+// import { MessageInputType } from './components/chat/composers';
 import axios from 'axios';
 
-export function Chat({ url, ready, title, description }: any) {
+export function Chat({ url, ready, title, description, name }: any) {
 
   interface User {
       name: string
@@ -25,30 +25,27 @@ export function Chat({ url, ready, title, description }: any) {
   const globalChatContext: Potato.GlobalChatContext<User> = {
       dateTime: Date.now(),
       users: {
-          'self': null,   
-          'kevin': { name: "Kevin James" },
-          'brian': { name: "Brian Gasper" },
-          'parrot': { name: "Ze Parrot" }
+          'self': null,
+          'bot': { name }
       }
   }
 
-  const messages: Potato.Messages<MessageInputType> = [
-      {
-          input: "Hi here, how are you doing", 
-          dateTimeDelta: 129122762,
-          user: 'kevin'
-      },
-      { 
-          input: "Sent this message on Wednesday", 
-          dateTimeDelta: 215617315,
-          user: 'brian'
-      }
-  ]
-
+  // const messages: Potato.Messages<MessageInputType> = [
+  //   {
+  //       input: "Hi here, how are you doing", 
+  //       dateTimeDelta: 129122762,
+  //       user: 'kevin'
+  //   },
+  //   { 
+  //       input: "Sent this message on Wednesday", 
+  //       dateTimeDelta: 215617315,
+  //       user: 'brian'
+  //   }
+  // ]
   return (
     <PotatoChatProvider 
-      initialMessages={messages}
-      globalChatContext={globalChatContext}>
+        initialMessages={[]}
+        globalChatContext={globalChatContext}>
         <ChatBox url={url} title={title} description={description} />
     </PotatoChatProvider>
   )
@@ -58,6 +55,7 @@ function App() {
 
   const [title, setTitle] = useState("<Untitled>")
   const [description, setDescription] = useState("<description>")
+  const [name, setChatName] = useState("Unknown")
 
   const [url, setUrl] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -76,6 +74,7 @@ function App() {
         .then(response => {
           setTitle(response.data.title)
           setDescription(response.data.description)
+          setChatName(response.data.name)
           setReady(true)
         })
         .catch(() => {
@@ -128,6 +127,7 @@ function App() {
             <Chat 
               url={url}
               ready={ready}
+              name={name}
               title={title}
               description={description}/>
         </div>

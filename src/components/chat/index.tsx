@@ -69,7 +69,7 @@ function Message({ messageId }: any) {
 
 
 function ComposerBox({ sendAction }: ComposerBoxProps<ComposerType, MessageInputType>) {
-    const [compType, setCompType] = useComposerType<ComposerType>()
+    const [compType, ] = useComposerType<ComposerType>()
     const ComposerComponent = useComposerComponent(compType)
 
     // TODO: this re-rendering is not supposed to happen
@@ -130,7 +130,7 @@ export  default function ChatBox({ url, title, description }: any) {
                 })
             }).then((response) => {                
                 const { data } = response
-                return ({ input: data.message, user: 'parrot' }) as Potato.Composer.NewMessage<T>
+                return ({ input: data.message, user: 'bot' }) as Potato.Composer.NewMessage<T>
             }).then(message => addToMessageList(message))
         }
     }
