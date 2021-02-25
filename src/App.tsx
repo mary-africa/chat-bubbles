@@ -49,13 +49,7 @@ export function Chat({ url, ready, title, description }: any) {
     <PotatoChatProvider 
       initialMessages={messages}
       globalChatContext={globalChatContext}>
-          <div className="w-full divide-y divide-gray-300 border rounded-md shadow-sm">
-              <div className="bg-blue-400 w-full px-4 py-6">
-                  <h1 className="text-3xl font-bold">{title}</h1>
-                  <p className="text-sm">{description}</p>
-              </div>
-              <ChatBox url={url} />
-          </div>
+        <ChatBox url={url} title={title} description={description} />
     </PotatoChatProvider>
   )
 }

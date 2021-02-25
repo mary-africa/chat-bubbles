@@ -1,11 +1,13 @@
 // import { useCallback } from 'react';
 import axios from 'axios';
 import { Potato } from '../react-chat-potato/@types';
-import { PotatoChat, ComposerBoxProps, PotatoChatProvider } from '../react-chat-potato/src'
-import { useChatUser, useMessage, useComposerComponent, useComposerType, useMessageUpdater } from '../react-chat-potato/src/utils';
+import { PotatoChat, ComposerBoxProps } from '../react-chat-potato/src'
+import { useChatUser, useMessage, useComposerComponent, useComposerType, useMessageUpdater, useMessages } from '../react-chat-potato/src/utils';
 import { ComposerType, MessageInputType, composerOptions } from './composers'
 // import { useMessageUpdater } from '../react-chat-potato/src/utils';
 // import { useState } from 'react';
+
+import { useSpring, animated, config } from 'react-spring'
 
 
 /**
@@ -26,6 +28,14 @@ function MessageCanvasWrapper({ children }: any) {
 
 function BaseMessage({ user, children, self }: any) {
     const isYourMessage = Boolean(self)
+    const styleProps = useSpring({
+        opacity: 100,
+        from: {
+            opacity: 0
+        },
+        delay: 100,
+        config: config.wobbly })
+
     return (
         <div className={`py-2 px-4 flex ${ isYourMessage ? 'flex-row-reverse': 'flex-row'} items-start`}>
             {/* {
@@ -35,10 +45,11 @@ function BaseMessage({ user, children, self }: any) {
                     </span>
                 ) : null
             } */}
-            <div className={`px-4 py-2 rounded-xl max-w-sm bg-white shadow-sm`}>
+            
+            <animated.div className={`px-4 py-2 rounded-xl max-w-sm bg-white shadow-sm`} style={styleProps}>
                 <label className="text-xs font-semibold text-gray-500">{user.name}</label>
                 {children}
-            </div>
+            </animated.div>
         </div>
     )
 }
@@ -89,6 +100,12 @@ function ComposerBox({ sendAction }: ComposerBoxProps<ComposerType, MessageInput
  */
 export  default function ChatBox({ url, title, description }: any) {
     const addToMessageList = useMessageUpdater()
+    const messages = useMessages(state => state)
+
+    const textProps = useSpring({
+        opacity: 100,
+        from: { opacity: 0 },
+    })
 
     const sendAction = async <T extends MessageInputType>(input: Potato.Composer.NewMessage<T>, composerType: ComposerType): Promise<void> => {
         console.log("Send message:", input)
@@ -98,7 +115,7 @@ export  default function ChatBox({ url, title, description }: any) {
         addToMessageList(input)
 
         if (composerType === 'text') {
-            axios({
+            axios({ 
                 url,
                 method: 'POST',
                 headers: {
@@ -106,6 +123,9 @@ export  default function ChatBox({ url, title, description }: any) {
                   "Access-Control-Allow-Origin": "*"
                 },
                 data: JSON.stringify({
+                    state: {
+                        history: messages.map(x => x.input)
+                    },
                     message: input.input
                 })
             }).then((response) => {                
@@ -114,14 +134,21 @@ export  default function ChatBox({ url, title, description }: any) {
             }).then(message => addToMessageList(message))
         }
     }
+    // http://localhost:3003/chathook/parrot
 
     return (
-        <PotatoChat
-            initialComposer='text'
-            composerOptions={composerOptions}
-            messageComponent={Message}
-            messageCanvasWrapper={MessageCanvasWrapper}
-            composerBox={ComposerBox}
-            sendAction={sendAction} />
+        <div className="w-full divide-y divide-gray-300 border rounded-md shadow-sm">
+            <div className="bg-blue-400 w-full px-4 py-6">
+                <animated.h1 className="text-3xl font-bold" style={textProps}>{title}</animated.h1>
+                <animated.p className="text-sm" style={textProps}>{description}</animated.p>
+            </div>
+            <PotatoChat
+                initialComposer='text'
+                composerOptions={composerOptions}
+                messageComponent={Message}
+                messageCanvasWrapper={MessageCanvasWrapper}
+                composerBox={ComposerBox}
+                sendAction={sendAction} />
+        </div>
     )
 }
