@@ -79,6 +79,7 @@ function App() {
         })
         .catch(() => {
           setError("Unable to do initiate chat")
+          setReady(false)
         })
     }
   }, [url])
