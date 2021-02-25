@@ -1,45 +1,12 @@
 // import { useCallback } from 'react';
 import axios from 'axios';
-import reportWebVitals from '../../reportWebVitals';
 import { Potato } from '../react-chat-potato/@types';
-import { PotatoChat, ComposerBoxProps } from '../react-chat-potato/src'
-import { useChatUser, useMessage, useComposerComponent, useComposerType } from '../react-chat-potato/src/utils';
-import { useMessageUpdater } from '../react-chat-potato/utils';
+import { PotatoChat, ComposerBoxProps, PotatoChatProvider } from '../react-chat-potato/src'
+import { useChatUser, useMessage, useComposerComponent, useComposerType, useMessageUpdater } from '../react-chat-potato/src/utils';
 import { ComposerType, MessageInputType, composerOptions } from './composers'
+// import { useMessageUpdater } from '../react-chat-potato/src/utils';
+// import { useState } from 'react';
 
-interface User {
-    name: string
-    avatar?: string
-}
-
-const globalChatContext: Potato.GlobalChatContext<User> = {
-    dateTime: Date.now(),
-    users: {
-        'self': null,   // TODO: this should indicate that user can chat
-        'kevin': {
-            name: "Kevin James",
-        },
-        'brian': {
-            name: "Brian Gasper"
-        },
-        'parrot': {
-            name: "Ze Parrot"
-        }
-    }
-}
-
-const messages: Potato.Messages<MessageInputType> = [
-    {
-        input: "Hi here, how are you doing", 
-        dateTimeDelta: 129122762,
-        user: 'kevin'
-    },
-    { 
-        input: "Sent this message on Wednesday", 
-        dateTimeDelta: 215617315,
-        user: 'brian'
-    }
-]
 
 /**
  * Structure of the user -> me (the person typing)
@@ -120,13 +87,18 @@ function ComposerBox({ sendAction }: ComposerBoxProps<ComposerType, MessageInput
 /**
  * TODO: add ability to update board for sending infromation
  */
-export default function ChatBox({ url, title, description }: any) {
-    const sendAction = async <T extends MessageInputType>(input: Potato.Composer.NewMessage<T>, composerType: ComposerType): Promise<null | Potato.Composer.NewMessage<T>> => {
+export  default function ChatBox({ url, title, description }: any) {
+    const addToMessageList = useMessageUpdater()
+
+    const sendAction = async <T extends MessageInputType>(input: Potato.Composer.NewMessage<T>, composerType: ComposerType): Promise<void> => {
         console.log("Send message:", input)
         console.log("ComposerType:", composerType)
 
+        // update the message list
+        addToMessageList(input)
+
         if (composerType === 'text') {
-            const response = await axios({
+            axios({
                 url,
                 method: 'POST',
                 headers: {
@@ -136,31 +108,20 @@ export default function ChatBox({ url, title, description }: any) {
                 data: JSON.stringify({
                     message: input.input
                 })
-            })
-
-            const { data } = response
-            return ({ input: data.message, user: 'parrot' }) as Potato.Composer.NewMessage<T>
+            }).then((response) => {                
+                const { data } = response
+                return ({ input: data.message, user: 'parrot' }) as Potato.Composer.NewMessage<T>
+            }).then(message => addToMessageList(message))
         }
-
-        return null
     }
 
     return (
-        // wrapper for the chat
-        <div className="w-full divide-y divide-gray-300 border rounded-md shadow-sm">
-            <div className="bg-blue-400 w-full px-4 py-6">
-                <h1 className="text-3xl font-bold">{title}</h1>
-                <p className="text-sm">{description}</p>
-            </div>
-            <PotatoChat 
-                initialComposer='text'
-                initialMessages={messages}
-                globalChatContext={globalChatContext}
-                composerOptions={composerOptions}
-                messageComponent={Message}
-                messageCanvasWrapper={MessageCanvasWrapper}
-                composerBox={ComposerBox}
-                sendAction={sendAction} />
-        </div>
+        <PotatoChat
+            initialComposer='text'
+            composerOptions={composerOptions}
+            messageComponent={Message}
+            messageCanvasWrapper={MessageCanvasWrapper}
+            composerBox={ComposerBox}
+            sendAction={sendAction} />
     )
 }

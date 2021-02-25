@@ -1,33 +1,92 @@
 import React, { useCallback, useState } from 'react';
 
 import ChatBox from './components/chat'
-import axios from 'axios'
+import { Potato } from './components/react-chat-potato/@types';
+import { PotatoChatProvider } from './components/react-chat-potato/src';
+import { MessageInputType } from './components/chat/composers';
+import axios from 'axios';
+
+export function Chat({ url, ready, title, description }: any) {
+
+  interface User {
+      name: string
+      avatar?: string
+  }
+
+  if (!Boolean(ready)) {
+    return (
+      <div>
+        not ready
+      </div>
+    )
+  }
+  
+    
+  const globalChatContext: Potato.GlobalChatContext<User> = {
+      dateTime: Date.now(),
+      users: {
+          'self': null,   
+          'kevin': { name: "Kevin James" },
+          'brian': { name: "Brian Gasper" },
+          'parrot': { name: "Ze Parrot" }
+      }
+  }
+
+  const messages: Potato.Messages<MessageInputType> = [
+      {
+          input: "Hi here, how are you doing", 
+          dateTimeDelta: 129122762,
+          user: 'kevin'
+      },
+      { 
+          input: "Sent this message on Wednesday", 
+          dateTimeDelta: 215617315,
+          user: 'brian'
+      }
+  ]
+
+  return (
+    <PotatoChatProvider 
+      initialMessages={messages}
+      globalChatContext={globalChatContext}>
+          <div className="w-full divide-y divide-gray-300 border rounded-md shadow-sm">
+              <div className="bg-blue-400 w-full px-4 py-6">
+                  <h1 className="text-3xl font-bold">{title}</h1>
+                  <p className="text-sm">{description}</p>
+              </div>
+              <ChatBox url={url} />
+          </div>
+    </PotatoChatProvider>
+  )
+}
 
 function App() {
+
   const [title, setTitle] = useState("<Untitled>")
   const [description, setDescription] = useState("<description>")
 
   const [url, setUrl] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [ready, setReady] = useState(false)
 
 
   const attemptChatConnection = useCallback(() => {
     setError(null)
+    setReady(false)
 
     if (url.trim().length === 0) {
       setError("You need to set enter the URL")
     } else {
       // Send the message
-      axios({
-        url,
-        method: 'GET',
-        headers: {
-          "Access-Control-Allow-Origin": "*"
-        }
-      }).then((response) => {
-        setTitle(response.data.title)
-        setDescription(response.data.description)
-      })
+      axios.get(url)
+        .then(response => {
+          setTitle(response.data.title)
+          setDescription(response.data.description)
+          setReady(true)
+        })
+        .catch(() => {
+          setError("Unable to do initiate chat")
+        })
     }
   }, [url])
 
@@ -72,8 +131,9 @@ function App() {
 
         {/* right */}
         <div>
-            <ChatBox 
+            <Chat 
               url={url}
+              ready={ready}
               title={title}
               description={description}/>
         </div>
