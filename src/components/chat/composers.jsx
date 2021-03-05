@@ -1,7 +1,9 @@
 import { useState } from "react"
-// import { Potato } from "react-chat-potato/@types"
-const { useSendCallback } = require("react-chat-potato/utils")
+import { useSendCallback } from "react-chat-potato/utils"
 
+/**
+ * Input composer for when someone selects image option
+ */
 function ImageComposer({ sendAction }) {
     const [fileValue, setFile] = useState("")
 
@@ -18,6 +20,9 @@ function ImageComposer({ sendAction }) {
 }
     
 
+/**
+ * Input composer for when someone selects text input option
+ */
 function TextComposer ({ sendAction }) {
     const [value, setValue] = useState("")
     const onSend = useSendCallback(value, sendAction)
@@ -35,23 +40,9 @@ function TextComposer ({ sendAction }) {
     )
 }
     
-
-
 /**
- * Composer Component details
+ * This is for setting up different composers for the chat input
  */
-// export type ComposerType =
-//     | 'text'
-//     | 'image'
-
-
-// export type MessageInputType =
-//     | string    // message type for text
-//     | string    // message type for image
-
-
-// TODO: Could be possible reason of rerendering
-//  when  `composerType` changes.. the `composerOpotions` are recreated
 export const composerOptions = {
     'text': { component: TextComposer },
     'image': { component: ImageComposer },

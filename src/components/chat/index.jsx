@@ -5,15 +5,22 @@ import { useSpring, animated, config } from 'react-spring'
 import { useEffect, useRef } from 'react';
 
 import { PotatoChat } from 'react-chat-potato'
-const { useChatUser, useMessage, useComposerComponent, useComposerType, useMessageUpdater, useMessages } = require('react-chat-potato/utils')
+import { useChatUser, useMessage, useComposerComponent, useComposerType, useMessageUpdater, useMessages } from 'react-chat-potato/utils'
 
 /**
  * Structure of the user -> me (the person typing)
  */
 const selfUser = { name: "Me" }
+
+/**
+ * Structure of the message of an anonymous user (user that is not described in the globalContext)
+ */
 const defaultUnknownUser = { name: "Anonymous" }
 
 
+/**
+ * Component that is used for wrapping the entire message content
+ */
 function MessageCanvasWrapper({ children }) {
     const messageCanvasRef = useRef(null)
     const _messages = useMessages()
@@ -39,6 +46,9 @@ function MessageCanvasWrapper({ children }) {
 }
 
 
+/**
+ * Designing for creating the message bubble
+ */
 function BaseMessage({ user, children, self }) {
     const isYourMessage = Boolean(self)
     const styleProps = useSpring({
@@ -51,14 +61,6 @@ function BaseMessage({ user, children, self }) {
 
     return (
         <div className={`py-2 px-4 flex ${ isYourMessage ? 'flex-row-reverse': 'flex-row'} items-start`}>
-            {/* {
-                !isYourMessage ? (
-                    <span className="inline-flex items-center mr-1.5 mt-1.5 justify-center h-10 w-10 rounded-full bg-gray-500">
-                        <span className="font-medium leading-none text-white">TW</span>
-                    </span>
-                ) : null
-            } */}
-            
             <animated.div className={`px-4 py-2 rounded-xl max-w-sm bg-white shadow-sm`} style={styleProps}>
                 <label className="text-xs font-semibold text-gray-500">{user.name}</label>
                 {children}
@@ -67,6 +69,9 @@ function BaseMessage({ user, children, self }) {
     )
 }
 
+/**
+ * Message component that are used in rendering in the component screen
+ */
 function Message({ messageId }) {
     const message = useMessage(messageId)
     const user = useChatUser(message.user, selfUser, defaultUnknownUser)
@@ -80,36 +85,22 @@ function Message({ messageId }) {
 }
 
 
-
+/**
+ * ComposerBox is the region where users get to input the message input for the chat
+ */
 function ComposerBox({ sendAction }) {
     const [compType, ] = useComposerType()
     const ComposerComponent = useComposerComponent(compType)
 
-    // TODO: this re-rendering is not supposed to happen
-    // console.log("Kevin")
-    // callback for adding switching btn types
-    // const onChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    //     setCompType(e.target.value as ComposerType)
-    // }, [setCompType])
-
     return (
         <div className="w-full flex flex-col">
-            {/* <div className="w-full"> */}
                 <ComposerComponent sendAction={sendAction} />
-            {/* </div> */}
-            {/* <div className="w-full">
-                <label>Composer Option:</label>
-                <select name="composer-option" onChange={onChange} value={compType}>
-                    <option value="text">Text</option>
-                    <option value="image">Image</option>
-                </select>
-            </div> */}
         </div>
     )
 }
 
 /**
- * TODO: add ability to update board for sending infromation
+ * This is the entire chat frame for the App
  */
 export  default function ChatBox({ url, title, description }) {
     const addToMessageList = useMessageUpdater()
@@ -121,9 +112,6 @@ export  default function ChatBox({ url, title, description }) {
     })
 
     const sendAction = async (input, composerType) => {
-        console.log("Send message:", input)
-        console.log("ComposerType:", composerType)
-
         // update the message list
         addToMessageList(input)
 

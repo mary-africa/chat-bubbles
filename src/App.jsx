@@ -1,17 +1,11 @@
 import React, { useCallback, useState } from 'react';
 
-import ChatBox from './components/chat'
-// import { Potato } from './components/react-chat-potato/@types';
 import { PotatoChatProvider } from 'react-chat-potato';
-// import { MessageInputType } from './components/chat/composers';
 import axios from 'axios';
 
-export function Chat({ url, ready, title, description, name }) {
+import ChatBox from './components/chat'
 
-  // interface User {
-  //     name: string
-  //     avatar?: string
-  // }
+export function Chat({ url, ready, title, description, name }) {
 
   if (!Boolean(ready)) {
     return (
@@ -30,22 +24,8 @@ export function Chat({ url, ready, title, description, name }) {
       }
   }
 
-  // const messages: Potato.Messages<MessageInputType> = [
-  //   {
-  //       input: "Hi here, how are you doing", 
-  //       dateTimeDelta: 129122762,
-  //       user: 'kevin'
-  //   },
-  //   { 
-  //       input: "Sent this message on Wednesday", 
-  //       dateTimeDelta: 215617315,
-  //       user: 'brian'
-  //   }
-  // ]
   return (
-    <PotatoChatProvider 
-        initialMessages={[]}
-        globalChatContext={globalChatContext}>
+    <PotatoChatProvider globalChatContext={globalChatContext}>
         <ChatBox url={url} title={title} description={description} />
     </PotatoChatProvider>
   )
