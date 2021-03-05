@@ -8,6 +8,7 @@ import { ComposerType, MessageInputType, composerOptions } from './composers'
 // import { useState } from 'react';
 
 import { useSpring, animated, config } from 'react-spring'
+import { useEffect, useRef } from 'react';
 
 
 /**
@@ -18,8 +19,24 @@ const defaultUnknownUser = { name: "Anonymous" }
 
 
 function MessageCanvasWrapper({ children }: any) {
+    const messageCanvasRef = useRef(null)
+    const _messages = useMessages()
+
+    useEffect(() => {
+        if (messageCanvasRef === null) {
+            throw new Error("message canvas not rendered")
+        }
+        
+        // @ts-ignore
+        const scroll = messageCanvasRef.current.scrollHeight - messageCanvasRef.current.clientHeight;
+
+        // @ts-ignore
+        messageCanvasRef.current.scrollTo(0, scroll);
+    }, [_messages])
+
+
     return (
-        <div className="bg-gray-100 h-96 overflow-y-auto py-2 flex flex-col justify-end">
+        <div className="bg-gray-100 h-96 overflow-y-auto py-2 flex flex-col" ref={messageCanvasRef}>
             {children}
         </div>
     )

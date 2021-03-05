@@ -85,10 +85,10 @@ function App() {
   }, [url])
 
   return (
-    <div className="relative h-screen w-full p-24">
-      {error !== null ? (<div className="bg-red-700 text-xl font-bold text-white">{error}</div>): null}
+    <div className="relative h-screen w-full flex flex-col justify-between p-24">
       {/* body of the site */}
       <section className="w-full mx-auto container grid grid-rows-2 md:grid-cols-2 gap-4 md:gap-10">
+        {error !== null ? (<div className="bg-red-700 text-xl font-bold text-white">{error}</div>): null}
         {/* left */}
         <div>
           {/* Intro text */}
@@ -133,7 +133,7 @@ function App() {
               description={description}/>
         </div>
       </section>
-      <footer className="absolute bottom-0">
+      <footer>
         <div className="mx-auto container py-8">
           <div>
             <p className="text-gray-600">
