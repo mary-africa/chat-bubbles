@@ -1,15 +1,11 @@
 // import { useCallback } from 'react';
 import axios from 'axios';
-import { Potato } from '../react-chat-potato/@types';
-import { PotatoChat, ComposerBoxProps } from '../react-chat-potato/src'
-import { useChatUser, useMessage, useComposerComponent, useComposerType, useMessageUpdater, useMessages } from '../react-chat-potato/src/utils';
-import { ComposerType, MessageInputType, composerOptions } from './composers'
-// import { useMessageUpdater } from '../react-chat-potato/src/utils';
-// import { useState } from 'react';
-
+import { composerOptions } from './composers'
 import { useSpring, animated, config } from 'react-spring'
 import { useEffect, useRef } from 'react';
 
+import { PotatoChat } from 'react-chat-potato'
+const { useChatUser, useMessage, useComposerComponent, useComposerType, useMessageUpdater, useMessages } = require('react-chat-potato/utils')
 
 /**
  * Structure of the user -> me (the person typing)
@@ -18,7 +14,7 @@ const selfUser = { name: "Me" }
 const defaultUnknownUser = { name: "Anonymous" }
 
 
-function MessageCanvasWrapper({ children }: any) {
+function MessageCanvasWrapper({ children }) {
     const messageCanvasRef = useRef(null)
     const _messages = useMessages()
 
@@ -43,7 +39,7 @@ function MessageCanvasWrapper({ children }: any) {
 }
 
 
-function BaseMessage({ user, children, self }: any) {
+function BaseMessage({ user, children, self }) {
     const isYourMessage = Boolean(self)
     const styleProps = useSpring({
         opacity: 100,
@@ -71,22 +67,22 @@ function BaseMessage({ user, children, self }: any) {
     )
 }
 
-function Message({ messageId }: any) {
-    const message = useMessage(messageId as number)
+function Message({ messageId }) {
+    const message = useMessage(messageId)
     const user = useChatUser(message.user, selfUser, defaultUnknownUser)
 
     return (
         <BaseMessage user={user} self={message.user === "self"}>
             {/* @ts-ignore */}
-            <p className="w-full truncate" style={{ hyphens: 'auto' }}>{message.input as string}</p>
+            <p className="w-full truncate" style={{ hyphens: 'auto' }}>{message.input}</p>
         </BaseMessage>
     )
 }
 
 
 
-function ComposerBox({ sendAction }: ComposerBoxProps<ComposerType, MessageInputType>) {
-    const [compType, ] = useComposerType<ComposerType>()
+function ComposerBox({ sendAction }) {
+    const [compType, ] = useComposerType()
     const ComposerComponent = useComposerComponent(compType)
 
     // TODO: this re-rendering is not supposed to happen
@@ -115,7 +111,7 @@ function ComposerBox({ sendAction }: ComposerBoxProps<ComposerType, MessageInput
 /**
  * TODO: add ability to update board for sending infromation
  */
-export  default function ChatBox({ url, title, description }: any) {
+export  default function ChatBox({ url, title, description }) {
     const addToMessageList = useMessageUpdater()
     const messages = useMessages(state => state)
 
@@ -124,7 +120,7 @@ export  default function ChatBox({ url, title, description }: any) {
         from: { opacity: 0 },
     })
 
-    const sendAction = async <T extends MessageInputType>(input: Potato.Composer.NewMessage<T>, composerType: ComposerType): Promise<void> => {
+    const sendAction = async (input, composerType) => {
         console.log("Send message:", input)
         console.log("ComposerType:", composerType)
 
@@ -147,11 +143,10 @@ export  default function ChatBox({ url, title, description }: any) {
                 })
             }).then((response) => {                
                 const { data } = response
-                return ({ input: data.message, user: 'bot' }) as Potato.Composer.NewMessage<T>
+                return ({ input: data.message, user: 'bot' })
             }).then(message => addToMessageList(message))
         }
     }
-    // http://localhost:3003/chathook/parrot
 
     return (
         <div className="w-full divide-y divide-gray-300 border rounded-md shadow-sm">

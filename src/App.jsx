@@ -1,17 +1,17 @@
 import React, { useCallback, useState } from 'react';
 
 import ChatBox from './components/chat'
-import { Potato } from './components/react-chat-potato/@types';
-import { PotatoChatProvider } from './components/react-chat-potato/src';
+// import { Potato } from './components/react-chat-potato/@types';
+import { PotatoChatProvider } from 'react-chat-potato';
 // import { MessageInputType } from './components/chat/composers';
 import axios from 'axios';
 
-export function Chat({ url, ready, title, description, name }: any) {
+export function Chat({ url, ready, title, description, name }) {
 
-  interface User {
-      name: string
-      avatar?: string
-  }
+  // interface User {
+  //     name: string
+  //     avatar?: string
+  // }
 
   if (!Boolean(ready)) {
     return (
@@ -22,7 +22,7 @@ export function Chat({ url, ready, title, description, name }: any) {
   }
   
     
-  const globalChatContext: Potato.GlobalChatContext<User> = {
+  const globalChatContext = {
       dateTime: Date.now(),
       users: {
           'self': null,
@@ -58,7 +58,7 @@ function App() {
   const [name, setChatName] = useState("Unknown")
 
   const [url, setUrl] = useState("")
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState(null)
   const [ready, setReady] = useState(false)
 
 

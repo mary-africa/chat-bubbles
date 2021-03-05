@@ -1,9 +1,9 @@
 import { useState } from "react"
-import { Potato } from "../react-chat-potato/@types"
-import { useSendCallback } from "../react-chat-potato/src/utils"
+// import { Potato } from "react-chat-potato/@types"
+const { useSendCallback } = require("react-chat-potato/utils")
 
-function ImageComposer <TComposerType, TMessageInputType>({ sendAction }: Potato.Composer.OptionComponentProps<TComposerType, TMessageInputType> ) {
-    const [fileValue, setFile] = useState<string>("")
+function ImageComposer({ sendAction }) {
+    const [fileValue, setFile] = useState("")
 
     const onSend = useSendCallback(fileValue, sendAction)
     return (
@@ -18,8 +18,8 @@ function ImageComposer <TComposerType, TMessageInputType>({ sendAction }: Potato
 }
     
 
-function TextComposer <TComposerType, TMessageInputType>({ sendAction }: Potato.Composer.OptionComponentProps<TComposerType, TMessageInputType>) {
-    const [value, setValue] = useState<string>("")
+function TextComposer ({ sendAction }) {
+    const [value, setValue] = useState("")
     const onSend = useSendCallback(value, sendAction)
 
     return (
@@ -40,19 +40,19 @@ function TextComposer <TComposerType, TMessageInputType>({ sendAction }: Potato.
 /**
  * Composer Component details
  */
-export type ComposerType =
-    | 'text'
-    | 'image'
+// export type ComposerType =
+//     | 'text'
+//     | 'image'
 
 
-export type MessageInputType =
-    | string    // message type for text
-    | string    // message type for image
+// export type MessageInputType =
+//     | string    // message type for text
+//     | string    // message type for image
 
 
 // TODO: Could be possible reason of rerendering
 //  when  `composerType` changes.. the `composerOpotions` are recreated
-export const composerOptions: Potato.ComposerOption<ComposerType, MessageInputType> = {
+export const composerOptions = {
     'text': { component: TextComposer },
     'image': { component: ImageComposer },
 }
