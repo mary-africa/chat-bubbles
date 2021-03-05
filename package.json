@@ -12,7 +12,7 @@
     "@types/react-dom": "^17.0.0",
     "axios": "^0.21.1",
     "react": "^17.0.1",
-    "react-chat-potato": "./src/components/react-chat-potato",
+    "react-chat-potato": "^0.2.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.3",
     "react-spring": "^8.0.27",
